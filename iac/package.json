@@ -1,0 +1,18 @@
+{
+  "name": "iac",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "up": "pulumi up",
+    "preview": "pulumi preview",
+    "destroy": "pulumi destroy"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "^3.113.0",
+    "@pulumi/azure-native": "^2.0.0"
+  }
+}
