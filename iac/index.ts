@@ -40,7 +40,7 @@ const pgCreds = {
   adminPassword: config.requireSecret("pgAdminPassword"),
 };
 const postgres = createPostgres({
-  name: "pg-db",
+  name: "devops-demo-db",
   resourceGroupName: resourceGroup.name,
   adminUser: pgCreds.adminUser,
   adminPassword: pgCreds.adminPassword,
