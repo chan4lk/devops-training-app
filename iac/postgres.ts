@@ -8,6 +8,7 @@ export interface PostgresArgs {
   adminPassword: pulumi.Input<string>;
   location: pulumi.Input<string>;
   skuName?: string;
+  tags?: { [key: string]: pulumi.Input<string> };
 }
 
 export function createPostgres(args: PostgresArgs) {
@@ -40,8 +41,11 @@ const server = new azure_native.dbforpostgresql.Server(args.name, {
     version: azure_native.dbforpostgresql.ServerVersion.ServerVersion_12,
 });
   
-
-  const db = new azure_native.dbforpostgresql.Database(`${args.name}-db`, {
+  // Database name - db-<app/service name>-<environment>-<instance>
+  const dbNameParts = args.name.split('-');
+  const dbNameBase = dbNameParts.length > 1 ? dbNameParts[1] : args.name; // Extract the project name part
+  
+  const db = new azure_native.dbforpostgresql.Database(`db-${dbNameBase}-001`, {
     resourceGroupName: args.resourceGroupName,
     serverName: server.name,
     charset: "UTF8",
