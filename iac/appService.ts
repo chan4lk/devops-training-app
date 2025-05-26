@@ -7,6 +7,7 @@ export interface AppServiceArgs {
   appServicePlanId: pulumi.Input<string>;
   location: pulumi.Input<string>;
   appSettings?: { [key: string]: pulumi.Input<string> };
+  tags?: { [key: string]: pulumi.Input<string> };
 }
 
 export function createAppService(args: AppServiceArgs) {
@@ -19,5 +20,6 @@ export function createAppService(args: AppServiceArgs) {
         ? Object.entries(args.appSettings).map(([name, value]) => ({ name, value }))
         : undefined,
     },
+    tags: args.tags,
   });
 }

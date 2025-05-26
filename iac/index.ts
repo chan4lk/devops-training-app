@@ -6,32 +6,51 @@ import { createPostgres } from "./postgres";
 // Config
 const config = new pulumi.Config();
 const location = config.get("location") || "WestEurope";
-const resourceGroup = new azure.resources.ResourceGroup("app-rg", { location });
+const environment = config.get("environment") || "dev";
+const projectName = config.get("projectName") || "devops";
 
-// App Service Plan
-const plan = new azure.web.AppServicePlan("appservice-plan", {
+// Common tags for all resources
+const commonTags = {
+  environment: environment,
+  project: projectName,
+  owner: "DevOps Team",
+  costCenter: "IT-123",
+  createdBy: "Pulumi"
+};
+
+// Resource Group - rg-<app/service name>-<environment>-<region>-<instance>
+const resourceGroup = new azure.resources.ResourceGroup(`rg-${projectName}-${environment}-${location}-001`, { 
+  location,
+  tags: commonTags
+});
+
+// App Service Plan - plan-<app/service name>-<environment>-<region>-<instance>
+const plan = new azure.web.AppServicePlan(`plan-${projectName}-${environment}-${location}-001`, {
   resourceGroupName: resourceGroup.name,
   location,
   sku: {
     name: "B1",
     tier: "Basic",
   },
+  tags: commonTags
 });
 
-// Frontend App Service
+// Frontend App Service - app-<app/service name>-<environment>-<region>-<instance>
 const frontend = createAppService({
-  name: "frontend-app",
+  name: `app-${projectName}-fe-${environment}-${location}-001`,
   resourceGroupName: resourceGroup.name,
   appServicePlanId: plan.id,
   location,
+  tags: commonTags
 });
 
-// Backend App Service
+// Backend App Service - app-<app/service name>-<environment>-<region>-<instance>
 const backend = createAppService({
-  name: "backend-app",
+  name: `app-${projectName}-be-${environment}-${location}-001`,
   resourceGroupName: resourceGroup.name,
   appServicePlanId: plan.id,
   location,
+  tags: commonTags
 });
 
 // Postgres DB
@@ -40,11 +59,12 @@ const pgCreds = {
   adminPassword: config.requireSecret("pgAdminPassword"),
 };
 const postgres = createPostgres({
-  name: "devops-demo-db",
+  name: `psql-${projectName}-${environment}-${location}-001`,
   resourceGroupName: resourceGroup.name,
   adminUser: pgCreds.adminUser,
   adminPassword: pgCreds.adminPassword,
   location,
+  tags: commonTags
 });
 
 export const frontendUrl = pulumi.interpolate`https://${frontend.defaultHostName}`;
