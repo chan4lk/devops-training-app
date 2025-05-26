@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as azure from "@pulumi/azure-native";
 import { createAppService } from "./appService";
-import { createPostgres } from "./postgres";
+import { createSqlServer } from "./sqlserver";
 
 // Config
 const config = new pulumi.Config();
@@ -58,7 +58,7 @@ const pgCreds = {
   adminUser: config.require("pgAdminUser"),
   adminPassword: config.requireSecret("pgAdminPassword"),
 };
-const postgres = createPostgres({
+const sqlServer = createSqlServer({
   name: `psql-${projectName}-${environment}-${location}-001`,
   resourceGroupName: resourceGroup.name,
   adminUser: pgCreds.adminUser,
@@ -69,5 +69,5 @@ const postgres = createPostgres({
 
 export const frontendUrl = pulumi.interpolate`https://${frontend.defaultHostName}`;
 export const backendUrl = pulumi.interpolate`https://${backend.defaultHostName}`;
-export const postgresServer = postgres.server.name;
-export const postgresDb = postgres.db.name;
+export const sqlServer = sqlServer.server.name;
+export const sqlServerDb = sqlServer.db.name;

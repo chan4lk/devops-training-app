@@ -12,25 +12,26 @@ export interface PostgresArgs {
 }
 
 export function createPostgres(args: PostgresArgs) {
-const server = new azure_native.dbforpostgresql.Server(args.name, {
+const server = new azure_native.dbforsqlserver.Server(args.name, {
     administratorLogin: args.adminUser,
     administratorLoginPassword: args.adminPassword,
     availabilityZone: "1",
     backup: {
         backupRetentionDays: 7,
-        geoRedundantBackup: azure_native.dbforpostgresql.GeoRedundantBackupEnum.Disabled,
+        geoRedundantBackup: azure_native.dbforsqlserver.GeoRedundantBackupEnum.Disabled,
     },
-    createMode: azure_native.dbforpostgresql.CreateMode.Create,
+    createMode: azure_native.dbforsqlserver.CreateMode.Create,
     highAvailability: {
-        mode: azure_native.dbforpostgresql.HighAvailabilityMode.ZoneRedundant,
+        mode: azure_native.dbforsqlserver.HighAvailabilityMode.ZoneRedundant,
     },
     location: args.location,
     
     resourceGroupName: args.resourceGroupName,
     serverName: args.name,
     sku: {
+        name: "Standard_DTU_10",
         name: args.skuName || "Standard_D4ds_v4",
-        tier: azure_native.dbforpostgresql.SkuTier.GeneralPurpose,
+        tier: azure_native.dbforsqlserver.SkuTier.Standard,
     },
     storage: {
         storageSizeGB: 512,
@@ -38,14 +39,14 @@ const server = new azure_native.dbforpostgresql.Server(args.name, {
     tags: {
         ElasticServer: "1",
     },
-    version: azure_native.dbforpostgresql.ServerVersion.ServerVersion_12,
+    version: azure_native.dbforsqlserver.ServerVersion.ServerVersion_2019,
 });
   
   // Database name - db-<app/service name>-<environment>-<instance>
   const dbNameParts = args.name.split('-');
   const dbNameBase = dbNameParts.length > 1 ? dbNameParts[1] : args.name; // Extract the project name part
   
-  const db = new azure_native.dbforpostgresql.Database(`db-${dbNameBase}-001`, {
+  const db = new azure_native.dbforsqlserver.Database(`db-${dbNameBase}-001`, {
     resourceGroupName: args.resourceGroupName,
     serverName: server.name,
     charset: "UTF8",
