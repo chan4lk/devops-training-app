@@ -1,4 +1,4 @@
-name: Deploy Infrastructure with Pulumi
+name: deploy-infra 
 
 on:
   push:
