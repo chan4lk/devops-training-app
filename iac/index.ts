@@ -53,21 +53,21 @@ const backend = createAppService({
   tags: commonTags
 });
 
-// Postgres DB
-const pgCreds = {
-  adminUser: config.require("pgAdminUser"),
-  adminPassword: config.requireSecret("pgAdminPassword"),
+// SQL Server DB with DTU 10
+const sqlCreds = {
+  adminUser: config.require("sqlAdminUser"),
+  adminPassword: config.requireSecret("sqlAdminPassword"),
 };
-const db = createSqlServer({
-  name: `psql-${projectName}-${environment}-${location}-001`,
+const sqlServerResource = createSqlServer({
+  name: `sql-${projectName}-${environment}-${location}-001`,
   resourceGroupName: resourceGroup.name,
-  adminUser: pgCreds.adminUser,
-  adminPassword: pgCreds.adminPassword,
+  adminUser: sqlCreds.adminUser,
+  adminPassword: sqlCreds.adminPassword,
   location,
   tags: commonTags
 });
 
 export const frontendUrl = pulumi.interpolate`https://${frontend.defaultHostName}`;
 export const backendUrl = pulumi.interpolate`https://${backend.defaultHostName}`;
-export const sqlServer = db.server.name;
-export const sqlServerDb = db.db.name;
+export const sqlServer = sqlServerResource.server.name;
+export const sqlServerDb = sqlServerResource.db.name;
