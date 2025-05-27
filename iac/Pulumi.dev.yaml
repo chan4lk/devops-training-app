@@ -2,5 +2,5 @@ config:
   azure-native:location: southeasteasia
   devops-demo:pgAdminUser: dbuser
   devops-demo:pgAdminPassword:
-    secure: AAABAE4R3V6vxAVTebTzkaXbQsC5bH4NyHH/af68TEhoaD9Fll9Fnw==
+    secure: AAABAI4FVCDdG4HvE3XPQ9DAMvo+6VTr2vqxloLsgI6A09slJhoczZuZ0a0=
   devops-demo:location: southeastasia

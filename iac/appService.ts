@@ -19,7 +19,11 @@ export function createAppService(args: AppServiceArgs) {
       appSettings: args.appSettings
         ? Object.entries(args.appSettings).map(([name, value]) => ({ name, value }))
         : undefined,
+      linuxFxVersion: "DOCKER|mcr.microsoft.com/appsvc/staticsite:latest", // Default container, will be overridden by deployment
+      alwaysOn: true,
+      http20Enabled: true,
     },
+    httpsOnly: true,
     tags: args.tags,
   });
 }

@@ -28,6 +28,8 @@ const resourceGroup = new azure.resources.ResourceGroup(`rg-${projectName}-${env
 const plan = new azure.web.AppServicePlan(`plan-${projectName}-${environment}-${location}-001`, {
   resourceGroupName: resourceGroup.name,
   location,
+  kind: "Linux",
+  reserved: true,
   sku: {
     name: "B1",
     tier: "Basic",
