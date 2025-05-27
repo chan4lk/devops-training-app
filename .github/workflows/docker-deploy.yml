@@ -17,6 +17,8 @@ jobs:
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.docker_tag.outputs.image_tag }}
     
     steps:
       - name: Checkout code
@@ -32,15 +34,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=sha,format=short
-            type=ref,event=branch
-            latest
+      - name: Set Docker image tag
+        id: docker_tag
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          echo "image_tag=sha-${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "Using Docker image tag: sha-${SHORT_SHA}"
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
@@ -48,8 +47,7 @@ jobs:
           context: .
           file: ./dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/${{ github.repository }}:${{ steps.docker_tag.outputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -89,18 +87,22 @@ jobs:
           echo "backend_app=$BACKEND_APP" >> $GITHUB_OUTPUT
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       
       - name: Deploy to Frontend Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ steps.get-resources.outputs.frontend_app }}
-          images: ghcr.io/${{ github.repository }}:latest
+          images: ghcr.io/${{ github.repository }}:${{ needs.build-and-push.outputs.image_tag }}
       
       - name: Deploy to Backend Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ steps.get-resources.outputs.backend_app }}
-          images: ghcr.io/${{ github.repository }}:latest
+          images: ghcr.io/${{ github.repository }}:${{ needs.build-and-push.outputs.image_tag }}
       
       - name: Log out from Azure
         run: az logout
