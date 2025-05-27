@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as azure from "@pulumi/azure-native";
 import { createAppService } from "./appService";
-import { createSqlServer } from "./sqlServer";
+import { createSqlServer } from "./sqlserver";
 
 // Config
 const config = new pulumi.Config();
