@@ -67,41 +67,18 @@ jobs:
           tenant-id: ${{ secrets.ARM_TENANT_ID }}
           subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       
-      - name: Get resource names from Pulumi stack
-        id: get-resources
-        run: |
-          # Install Pulumi CLI
-          curl -fsSL https://get.pulumi.com | sh
-          export PATH=$PATH:$HOME/.pulumi/bin
-          
-          # Configure Pulumi stack
-          cd ./iac
-          npm ci
-          pulumi stack select dev
-          
-          # Get the web app names from Pulumi stack outputs
-          FRONTEND_APP=$(pulumi stack output frontendUrl | sed 's/https:\/\///g' | sed 's/\.azurewebsites\.net//g')
-          BACKEND_APP=$(pulumi stack output backendUrl | sed 's/https:\/\///g' | sed 's/\.azurewebsites\.net//g')
-          
-          echo "frontend_app=$FRONTEND_APP" >> $GITHUB_OUTPUT
-          echo "backend_app=$BACKEND_APP" >> $GITHUB_OUTPUT
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      # Using GitHub variables for web app names instead of Pulumi
       
       - name: Deploy to Frontend Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ steps.get-resources.outputs.frontend_app }}
+          app-name: ${{ vars.AZURE_FRONTEND_APP_NAME }}
           images: ghcr.io/${{ github.repository }}:${{ needs.build-and-push.outputs.image_tag }}
       
       - name: Deploy to Backend Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ steps.get-resources.outputs.backend_app }}
+          app-name: app-devops-be-dev-southeastasia-0015906471e
           images: ghcr.io/${{ github.repository }}:${{ needs.build-and-push.outputs.image_tag }}
       
       - name: Log out from Azure
