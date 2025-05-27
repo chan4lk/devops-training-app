@@ -78,7 +78,7 @@ jobs:
       - name: Deploy to Backend Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: app-devops-be-dev-southeastasia-0015906471e
+          app-name: ${{ vars.AZURE_BACKEND_APP_NAME }}
           images: ghcr.io/${{ github.repository }}:${{ needs.build-and-push.outputs.image_tag }}
       
       - name: Log out from Azure
