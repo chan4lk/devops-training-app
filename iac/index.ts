@@ -55,8 +55,8 @@ const backend = createAppService({
 
 // SQL Server DB with DTU 10
 const sqlCreds = {
-  adminUser: config.require("sqlAdminUser"),
-  adminPassword: config.requireSecret("sqlAdminPassword"),
+  adminUser: config.require("pgAdminUser"),
+  adminPassword: config.requireSecret("pgAdminPassword"),
 };
 const sqlServerResource = createSqlServer({
   name: `sql-${projectName}-${environment}-${location}-001`,
